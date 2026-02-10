@@ -24,8 +24,17 @@ variable "subnet_ids" {
 
 variable "vpc_id" {
   type        = string
-  description = "The unique identifier of the VPC where AWS Network Firewall should create the firewall. Either 'vpc_id' or 'transit_gateway_id' must be provided, but not both"
   default     = null
+  description = "The unique identifier of the VPC where AWS Network Firewall should create the firewall. Either 'vpc_id' or 'transit_gateway_id' must be provided, but not both"
+}
+
+variable "vpc_endpoint_associations" {
+  type = map(object({
+    description     = optional(string)
+    subnet_mappings = list(string)
+  }))
+  default     = null
+  description = "Map of VPC endpoint associations. Each association includes an optional description and list of subnet IDs for the subnet mappings. Only applicable in VPC mode"
 }
 
 variable "transit_gateway_id" {

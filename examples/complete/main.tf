@@ -3,17 +3,17 @@ provider "aws" {
 }
 
 module "vpc" {
-  source  = "cloudposse/vpc/aws"
-  version = "3.0.0"
+  source  = "SevenPico/vpc/aws"
+  version = "3.0.2"
 
   ipv4_primary_cidr_block = "172.19.0.0/16"
 
-  context = module.this.context
+  context = module.context.context
 }
 
 module "subnets" {
-  source  = "cloudposse/dynamic-subnets/aws"
-  version = "2.4.2"
+  source  = "SevenPico/dynamic-subnets/aws"
+  version = "3.1.3"
 
   availability_zones   = var.availability_zones
   vpc_id               = module.vpc.vpc_id
@@ -22,7 +22,7 @@ module "subnets" {
   nat_gateway_enabled  = false
   nat_instance_enabled = false
 
-  context = module.this.context
+  context = module.context.context
 }
 
 module "s3_log_storage" {
@@ -32,7 +32,7 @@ module "s3_log_storage" {
   force_destroy = true
   attributes    = ["logs"]
 
-  context = module.this.context
+  context = module.context.context
 }
 
 module "network_firewall" {
@@ -77,7 +77,7 @@ module "network_firewall" {
   rule_group_config = {
     stateful-inspection-for-blocking-packets-from-going-to-destination = {
       capacity    = 50
-      name        = module.this.id
+      name        = module.context.id
       description = "Stateful Inspection for blocking packets from going to an intended destination"
       type        = "STATEFUL"
       rule_group = {
@@ -109,5 +109,5 @@ module "network_firewall" {
     }
   }
 
-  context = module.this.context
+  context = module.context.context
 }

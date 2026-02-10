@@ -1,8 +1,8 @@
 locals {
-  enabled                      = module.this.enabled
-  network_firewall_name        = var.network_firewall_name != null && var.network_firewall_name != "" ? var.network_firewall_name : module.this.id
+  enabled                      = module.context.enabled
+  network_firewall_name        = var.network_firewall_name != null && var.network_firewall_name != "" ? var.network_firewall_name : module.context.id
   network_firewall_description = var.network_firewall_description != null && var.network_firewall_description != "" ? var.network_firewall_description : local.network_firewall_name
-  network_firewall_policy_name = var.network_firewall_policy_name != null && var.network_firewall_policy_name != "" ? var.network_firewall_policy_name : module.this.id
+  network_firewall_policy_name = var.network_firewall_policy_name != null && var.network_firewall_policy_name != "" ? var.network_firewall_policy_name : module.context.id
   rule_group_config            = { for k, v in var.rule_group_config : k => v if local.enabled }
   logging_config               = { for k, v in var.logging_config : k => v if local.enabled }
   logging_enabled              = length(keys(local.logging_config)) > 0
@@ -60,7 +60,7 @@ resource "aws_networkfirewall_firewall" "default" {
     }
   }
 
-  tags = module.this.tags
+  tags = module.context.tags
 
   lifecycle {
     precondition {
@@ -251,7 +251,7 @@ resource "aws_networkfirewall_rule_group" "default" {
     }
   }
 
-  tags = module.this.tags
+  tags = module.context.tags
 }
 
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_firewall_policy
@@ -306,7 +306,7 @@ resource "aws_networkfirewall_firewall_policy" "default" {
     }
   }
 
-  tags = module.this.tags
+  tags = module.context.tags
 }
 
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_logging_configuration

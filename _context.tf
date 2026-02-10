@@ -1,28 +1,28 @@
 #
-# ONLY EDIT THIS FILE IN github.com/cloudposse/terraform-null-label
+# ONLY EDIT THIS FILE IN github.com/SevenPico/terraform-null-context
 # All other instances of this file should be a copy of that one
 #
 #
-# Copy this file from https://github.com/cloudposse/terraform-null-label/blob/master/exports/context.tf
+# Copy this file from https://github.com/SevenPico/terraform-null-context/blob/master/exports/context.tf
 # and then place it in your Terraform module to automatically get
-# Cloud Posse's standard configuration inputs suitable for passing
-# to Cloud Posse modules.
+# SevenPico's standard configuration inputs suitable for passing
+# to SevenPico modules.
 #
-# curl -sL https://raw.githubusercontent.com/cloudposse/terraform-null-label/master/exports/context.tf -o context.tf
+# curl -sL https://raw.githubusercontent.com/SevenPico/terraform-null-context/master/exports/context.tf -o context.tf
 #
-# Modules should access the whole context as `module.this.context`
+# Modules should access the whole context as `module.context.context`
 # to get the input variables with nulls for defaults,
-# for example `context = module.this.context`,
-# and access individual variables as `module.this.<var>`,
+# for example `context = module.context.context`,
+# and access individual variables as `module.context.<var>`,
 # with final values filled in.
 #
-# For example, when using defaults, `module.this.context.delimiter`
-# will be null, and `module.this.delimiter` will be `-` (hyphen).
+# For example, when using defaults, `module.context.context.delimiter`
+# will be null, and `module.context.delimiter` will be `-` (hyphen).
 #
 
-module "this" {
-  source  = "cloudposse/label/null"
-  version = "0.25.0" # requires Terraform >= 0.13.0
+module "context" {
+  source  = "SevenPico/context/null"
+  version = "2.0.0" # requires Terraform >= 0.13.0
 
   enabled             = var.enabled
   namespace           = var.namespace
@@ -45,7 +45,7 @@ module "this" {
   context = var.context
 }
 
-# Copy contents of cloudposse/terraform-null-label/variables.tf here
+# Copy contents of SevenPico/terraform-null-context/variables.tf here
 
 variable "context" {
   type = any
@@ -276,4 +276,4 @@ variable "descriptor_formats" {
     EOT
 }
 
-#### End of copy of cloudposse/terraform-null-label/variables.tf
+#### End of copy of SevenPico/terraform-null-context/variables.tf

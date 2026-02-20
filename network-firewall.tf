@@ -342,7 +342,7 @@ resource "aws_networkfirewall_logging_configuration" "default" {
 
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_vpc_endpoint_association
 resource "aws_networkfirewall_vpc_endpoint_association" "default" {
-  for_each = local.enabled && local.is_vpc_mode && var.vpc_endpoint_associations != null ? var.vpc_endpoint_associations : {}
+  for_each = local.enabled && var.vpc_id != null && var.vpc_endpoint_associations != null ? var.vpc_endpoint_associations : {}
 
   description  = lookup(each.value, "description", null)
   firewall_arn = one(aws_networkfirewall_firewall.default[*].arn)

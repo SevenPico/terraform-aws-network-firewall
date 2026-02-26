@@ -3,7 +3,7 @@ locals {
   network_firewall_name        = var.network_firewall_name != null && var.network_firewall_name != "" ? var.network_firewall_name : module.context.id
   network_firewall_description = var.network_firewall_description != null && var.network_firewall_description != "" ? var.network_firewall_description : local.network_firewall_name
   network_firewall_policy_name = var.network_firewall_policy_name != null && var.network_firewall_policy_name != "" ? var.network_firewall_policy_name : module.context.id
-  rule_group_config            = { for k, v in var.rule_group_config : k => v if local.enabled }
+  rule_group_config            = { for k, v in var.rule_group_config : k => v if local.enabled && !local.use_external_policy }
   logging_config               = { for k, v in var.logging_config : k => v if local.enabled }
   logging_enabled              = length(keys(local.logging_config)) > 0
 

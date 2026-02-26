@@ -16,6 +16,53 @@ Terraform module to provision AWS Network Firewall resources.
 
 ## Usage
 
+### AWS Managed Rule Groups Support
+
+This module now supports AWS Managed Rule Groups, which are pre-configured rule groups provided by AWS that help protect against common threats. These rule groups are referenced by ARN and don't need to be created as separate resources.
+
+**Key Features:**
+- Support for AWS Managed Rule Groups alongside custom rule groups
+- Automatic ARN construction for managed rule groups
+- Priority-based rule ordering
+- Backward compatibility with existing custom rule group configurations
+- Support for strict rule ordering when using managed rule groups
+- Support for external firewall policies (bring your own policy)
+
+**Available AWS Managed Rule Groups include:**
+- `AbusedLegitMalwareDomainsActionOrder` - Blocks traffic to domains that are abused by malware
+- `MalwareDomainsActionOrder` - Blocks traffic to known malware domains
+- `BotNetCommandAndControlDomainsActionOrder` - Blocks botnet command and control traffic
+- `ThreatIntelTorActionOrder` - Blocks traffic from Tor exit nodes
+- And many more...
+
+### External Firewall Policy Support
+
+The module also supports using an external (pre-existing) firewall policy instead of creating one. This is useful when you want to:
+- Use a centrally managed firewall policy across multiple firewalls
+- Separate policy management from firewall deployment
+- Use policies created by other tools or processes
+
+When `firewall_policy_arn` is provided, the module will:
+- Skip creating a firewall policy resource
+- Use the provided external policy ARN for the firewall
+- Ignore policy-related variables like `aws_managed_rule_groups`, `rule_group_config`, etc.
+
+**Example with external policy:**
+```hcl
+module "network_firewall" {
+  source = "SevenPico/network-firewall/aws"
+  
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.subnets.private_subnet_ids
+  
+  # Use an external firewall policy
+  firewall_policy_arn = "arn:aws:network-firewall:us-east-1:123456789012:firewall-policy/my-external-policy"
+  
+  # Policy-related variables are ignored when using external policy
+  # aws_managed_rule_groups = [] # Ignored
+  # rule_group_config = {}       # Ignored
+}
+```
 
 For a complete example, see [examples/complete](examples/complete)
 
@@ -80,6 +127,18 @@ module "network_firewall" {
   delete_protection                         = var.delete_protection
   firewall_policy_change_protection         = var.firewall_policy_change_protection
   subnet_change_protection                  = var.subnet_change_protection
+
+  # AWS Managed Rule Groups - these are referenced by ARN, not created as resources
+  aws_managed_rule_groups = [
+    {
+      name     = "AbusedLegitMalwareDomainsActionOrder"
+      priority = 100
+    },
+    {
+      name     = "MalwareDomainsActionOrder"
+      priority = 200
+    }
+  ]
 
   logging_config = {
     flow = {

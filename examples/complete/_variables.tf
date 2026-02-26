@@ -76,3 +76,18 @@ variable "subnet_change_protection" {
   description = "A boolean flag indicating whether it is possible to change the associated subnet(s)"
   default     = false
 }
+
+variable "aws_managed_rule_groups" {
+  type = list(object({
+    name     = string
+    priority = number
+  }))
+  description = "List of AWS Managed Rule Groups to include in the firewall policy"
+  default     = []
+}
+
+variable "firewall_policy_arn" {
+  type        = string
+  description = "ARN of an existing firewall policy to use instead of creating a new one. When provided, the module will not create a firewall policy and will use this external policy instead"
+  default     = null
+}

@@ -24,8 +24,13 @@ output "network_firewall_policy_name" {
 }
 
 output "network_firewall_policy_arn" {
-  description = "Network Firewall policy ARN"
-  value       = one(aws_networkfirewall_firewall_policy.default[*].arn)
+  description = "Network Firewall policy ARN (either created by module or external)"
+  value       = local.firewall_policy_arn
+}
+
+output "firewall_policy_created_by_module" {
+  description = "Whether the firewall policy was created by this module or externally provided"
+  value       = local.create_policy
 }
 
 output "az_subnet_endpoint_stats" {
@@ -41,4 +46,14 @@ output "transit_gateway_attachment_id" {
 output "transit_gateway_owner_account_id" {
   description = "The AWS account ID that owns the transit gateway. Only applicable in Transit Gateway mode"
   value       = local.enabled && local.is_tgw_mode ? try(one(aws_networkfirewall_firewall.default[*].transit_gateway_owner_account_id), null) : null
+}
+
+output "aws_managed_rule_groups" {
+  description = "Map of AWS Managed Rule Groups with their ARNs and priorities"
+  value       = local.aws_managed_rule_group_arns
+}
+
+output "custom_rule_groups" {
+  description = "Map of custom rule groups with their ARNs"
+  value       = { for k, v in aws_networkfirewall_rule_group.default : k => v.arn }
 }

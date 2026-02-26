@@ -53,6 +53,12 @@ module "network_firewall" {
   firewall_policy_change_protection         = var.firewall_policy_change_protection
   subnet_change_protection                  = var.subnet_change_protection
 
+  # AWS Managed Rule Groups - these are referenced by ARN, not created as resources
+  aws_managed_rule_groups = var.aws_managed_rule_groups
+
+  # External firewall policy ARN (optional) - when provided, module won't create a policy
+  firewall_policy_arn = var.firewall_policy_arn
+
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_logging_configuration
   logging_config = {
     flow = {

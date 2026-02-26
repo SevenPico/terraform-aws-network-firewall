@@ -25,7 +25,7 @@ output "network_firewall_policy_name" {
 
 output "network_firewall_policy_arn" {
   description = "Network Firewall policy ARN (either created by module or external)"
-  value       = local.firewall_policy_arn
+  value       = local.use_external_policy ? var.firewall_policy_arn : one(aws_networkfirewall_firewall_policy.default[*].arn)
 }
 
 output "firewall_policy_created_by_module" {

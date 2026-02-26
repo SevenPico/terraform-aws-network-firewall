@@ -10,7 +10,6 @@ locals {
   # Firewall policy configuration
   use_external_policy = var.firewall_policy_arn != null && var.firewall_policy_arn != ""
   create_policy       = local.enabled && !local.use_external_policy
-  firewall_policy_arn = local.use_external_policy ? var.firewall_policy_arn : one(aws_networkfirewall_firewall_policy.default[*].arn)
 
   # Determine deployment mode
   is_vpc_mode = var.vpc_id != null
@@ -42,7 +41,7 @@ resource "aws_networkfirewall_firewall" "default" {
   vpc_id             = var.vpc_id
   transit_gateway_id = var.transit_gateway_id
 
-  firewall_policy_arn               = local.firewall_policy_arn
+  firewall_policy_arn               = local.use_external_policy ? var.firewall_policy_arn : one(aws_networkfirewall_firewall_policy.default[*].arn)
   firewall_policy_change_protection = var.firewall_policy_change_protection
   subnet_change_protection          = var.subnet_change_protection
   delete_protection                 = var.delete_protection

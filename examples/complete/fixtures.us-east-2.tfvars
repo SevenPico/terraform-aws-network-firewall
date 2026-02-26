@@ -7,15 +7,3 @@ namespace = "eg"
 stage = "test"
 
 name = "network-firewall"
-
-# Example AWS Managed Rule Groups
-aws_managed_rule_groups = [
-  {
-    name     = "AbusedLegitMalwareDomainsActionOrder"
-    priority = 100
-  },
-  {
-    name     = "MalwareDomainsActionOrder"
-    priority = 200
-  }
-]

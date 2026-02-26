@@ -48,11 +48,6 @@ output "transit_gateway_owner_account_id" {
   value       = local.enabled && local.is_tgw_mode ? try(one(aws_networkfirewall_firewall.default[*].transit_gateway_owner_account_id), null) : null
 }
 
-output "aws_managed_rule_groups" {
-  description = "Map of AWS Managed Rule Groups with their ARNs and priorities"
-  value       = local.aws_managed_rule_group_arns
-}
-
 output "custom_rule_groups" {
   description = "Map of custom rule groups with their ARNs"
   value       = { for k, v in aws_networkfirewall_rule_group.default : k => v.arn }

@@ -16,25 +16,6 @@ Terraform module to provision AWS Network Firewall resources.
 
 ## Usage
 
-### AWS Managed Rule Groups Support
-
-This module now supports AWS Managed Rule Groups, which are pre-configured rule groups provided by AWS that help protect against common threats. These rule groups are referenced by ARN and don't need to be created as separate resources.
-
-**Key Features:**
-- Support for AWS Managed Rule Groups alongside custom rule groups
-- Automatic ARN construction for managed rule groups
-- Priority-based rule ordering
-- Backward compatibility with existing custom rule group configurations
-- Support for strict rule ordering when using managed rule groups
-- Support for external firewall policies (bring your own policy)
-
-**Available AWS Managed Rule Groups include:**
-- `AbusedLegitMalwareDomainsActionOrder` - Blocks traffic to domains that are abused by malware
-- `MalwareDomainsActionOrder` - Blocks traffic to known malware domains
-- `BotNetCommandAndControlDomainsActionOrder` - Blocks botnet command and control traffic
-- `ThreatIntelTorActionOrder` - Blocks traffic from Tor exit nodes
-- And many more...
-
 ### External Firewall Policy Support
 
 The module also supports using an external (pre-existing) firewall policy instead of creating one. This is useful when you want to:
@@ -127,18 +108,6 @@ module "network_firewall" {
   delete_protection                         = var.delete_protection
   firewall_policy_change_protection         = var.firewall_policy_change_protection
   subnet_change_protection                  = var.subnet_change_protection
-
-  # AWS Managed Rule Groups - these are referenced by ARN, not created as resources
-  aws_managed_rule_groups = [
-    {
-      name     = "AbusedLegitMalwareDomainsActionOrder"
-      priority = 100
-    },
-    {
-      name     = "MalwareDomainsActionOrder"
-      priority = 200
-    }
-  ]
 
   logging_config = {
     flow = {

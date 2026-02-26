@@ -1,6 +1,3 @@
-# Get current AWS region for constructing managed rule group ARNs
-data "aws_region" "current" {}
-
 locals {
   enabled                      = module.context.enabled
   network_firewall_name        = var.network_firewall_name != null && var.network_firewall_name != "" ? var.network_firewall_name : module.context.id
@@ -14,17 +11,6 @@ locals {
   use_external_policy = var.firewall_policy_arn != null && var.firewall_policy_arn != ""
   create_policy       = local.enabled && !local.use_external_policy
   firewall_policy_arn = local.use_external_policy ? var.firewall_policy_arn : one(aws_networkfirewall_firewall_policy.default[*].arn)
-
-  # AWS Managed Rule Groups configuration
-  aws_managed_rule_groups = local.enabled ? var.aws_managed_rule_groups : []
-  
-  # Construct ARNs for AWS Managed Rule Groups
-  aws_managed_rule_group_arns = {
-    for rg in local.aws_managed_rule_groups : rg.name => {
-      arn      = "arn:aws:network-firewall:${data.aws_region.current.region}:aws:managed-rulegroup/${rg.name}"
-      priority = rg.priority
-    }
-  }
 
   # Determine deployment mode
   is_vpc_mode = var.vpc_id != null
@@ -301,14 +287,6 @@ resource "aws_networkfirewall_firewall_policy" "default" {
       }
     }
 
-    # AWS Managed Rule Group references
-    dynamic "stateful_rule_group_reference" {
-      for_each = local.aws_managed_rule_group_arns
-      content {
-        resource_arn = stateful_rule_group_reference.value.arn
-        priority     = stateful_rule_group_reference.value.priority
-      }
-    }
 
     dynamic "stateful_engine_options" {
       for_each = var.policy_stateful_engine_options_rule_order != null && var.policy_stateful_engine_options_rule_order != "" ? [true] : []

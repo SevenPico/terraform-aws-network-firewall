@@ -24,13 +24,8 @@ output "network_firewall_policy_name" {
 }
 
 output "network_firewall_policy_arn" {
-  description = "Network Firewall policy ARN (either created by module or external)"
-  value       = local.use_external_policy ? var.firewall_policy_arn : one(aws_networkfirewall_firewall_policy.default[*].arn)
-}
-
-output "firewall_policy_created_by_module" {
-  description = "Whether the firewall policy was created by this module or externally provided"
-  value       = local.create_policy
+  description = "Network Firewall policy ARN created by the module"
+  value       = one(aws_networkfirewall_firewall_policy.default[*].arn)
 }
 
 output "az_subnet_endpoint_stats" {

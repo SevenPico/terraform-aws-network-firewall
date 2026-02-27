@@ -3,13 +3,9 @@ locals {
   network_firewall_name        = var.network_firewall_name != null && var.network_firewall_name != "" ? var.network_firewall_name : module.context.id
   network_firewall_description = var.network_firewall_description != null && var.network_firewall_description != "" ? var.network_firewall_description : local.network_firewall_name
   network_firewall_policy_name = var.network_firewall_policy_name != null && var.network_firewall_policy_name != "" ? var.network_firewall_policy_name : module.context.id
-  rule_group_config            = { for k, v in var.rule_group_config : k => v if var.enabled != false && (var.firewall_policy_arn == null || var.firewall_policy_arn == "") }
+  rule_group_config            = { for k, v in var.rule_group_config : k => v if local.enabled }
   logging_config               = { for k, v in var.logging_config : k => v if local.enabled }
   logging_enabled              = length(keys(local.logging_config)) > 0
-
-  # Firewall policy configuration
-  use_external_policy = var.firewall_policy_arn != null && var.firewall_policy_arn != ""
-  create_policy       = (var.firewall_policy_arn == null || var.firewall_policy_arn == "")
 
   # Determine deployment mode
   is_vpc_mode = var.vpc_id != null
@@ -41,7 +37,7 @@ resource "aws_networkfirewall_firewall" "default" {
   vpc_id             = var.vpc_id
   transit_gateway_id = var.transit_gateway_id
 
-  firewall_policy_arn               = local.use_external_policy ? var.firewall_policy_arn : one(aws_networkfirewall_firewall_policy.default[*].arn)
+  firewall_policy_arn               = one(aws_networkfirewall_firewall_policy.default[*].arn)
   firewall_policy_change_protection = var.firewall_policy_change_protection
   subnet_change_protection          = var.subnet_change_protection
   delete_protection                 = var.delete_protection
@@ -260,7 +256,7 @@ resource "aws_networkfirewall_rule_group" "default" {
 
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_firewall_policy
 resource "aws_networkfirewall_firewall_policy" "default" {
-  count = local.create_policy ? 1 : 0
+  count = local.enabled ? 1 : 0
 
   name = local.network_firewall_policy_name
 
@@ -283,6 +279,15 @@ resource "aws_networkfirewall_firewall_policy" "default" {
       content {
         resource_arn = stateful_rule_group_reference.value
         priority     = index([for k, v in aws_networkfirewall_rule_group.default : v.arn if v.type == "STATEFUL"], stateful_rule_group_reference.value) + 1
+      }
+    }
+
+    # AWS Managed Rule Groups
+    dynamic "stateful_rule_group_reference" {
+      for_each = var.aws_managed_rule_groups
+      content {
+        resource_arn = "arn:aws:network-firewall:${data.aws_region.current[0].name}:aws:managed-rulegroup/${stateful_rule_group_reference.value.name}"
+        priority     = stateful_rule_group_reference.value.priority
       }
     }
 

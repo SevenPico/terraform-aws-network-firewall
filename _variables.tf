@@ -105,14 +105,18 @@ variable "rule_group_config" {
   description = "Rule group configuration. Refer to [networkfirewall_rule_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/networkfirewall_rule_group) for configuration details"
 }
 
-variable "firewall_policy_arn" {
-  type        = string
-  description = "ARN of an existing firewall policy to use instead of creating a new one. When provided, the module will not create a firewall policy and will use this external policy instead"
-  default     = null
-}
 
 variable "logging_config" {
   type        = map(any)
   description = "Logging configuration"
   default     = {}
+}
+
+variable "aws_managed_rule_groups" {
+  type = list(object({
+    name     = string
+    priority = number
+  }))
+  description = "List of AWS managed rule groups to include in the firewall policy. Each object should have 'name' (the AWS managed rule group name) and 'priority' (evaluation priority)"
+  default     = []
 }

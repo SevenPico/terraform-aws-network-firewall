@@ -278,7 +278,8 @@ resource "aws_networkfirewall_firewall_policy" "default" {
       for_each = toset([for k, v in aws_networkfirewall_rule_group.default : v.arn if v.type == "STATEFUL"])
       content {
         resource_arn = stateful_rule_group_reference.value
-        priority     = index([for k, v in aws_networkfirewall_rule_group.default : v.arn if v.type == "STATEFUL"], stateful_rule_group_reference.value) + 1
+        # Only set priority for custom rule groups when NOT using STRICT_ORDER
+        priority = var.policy_stateful_engine_options_rule_order != "STRICT_ORDER" ? index([for k, v in aws_networkfirewall_rule_group.default : v.arn if v.type == "STATEFUL"], stateful_rule_group_reference.value) + 1 : null
       }
     }
 
@@ -287,6 +288,16 @@ resource "aws_networkfirewall_firewall_policy" "default" {
       for_each = var.aws_managed_rule_groups
       content {
         resource_arn = "arn:aws:network-firewall:${local.region}:aws-managed:stateful-rulegroup/${stateful_rule_group_reference.value.name}"
+        # AWS managed rule groups cannot have priority set
+        # When using STRICT_ORDER, AWS manages the priority automatically
+        
+        # Override configuration for AWS managed rule groups when using STRICT_ORDER
+        dynamic "override" {
+          for_each = var.policy_stateful_engine_options_rule_order == "STRICT_ORDER" ? [1] : []
+          content {
+            action = lookup(stateful_rule_group_reference.value, "override_action", "DROP_TO_ALERT")
+          }
+        }
       }
     }
 

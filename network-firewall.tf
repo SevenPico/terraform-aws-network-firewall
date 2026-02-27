@@ -9,7 +9,7 @@ locals {
 
   # Firewall policy configuration
   use_external_policy = var.firewall_policy_arn != null && var.firewall_policy_arn != ""
-  create_policy       = var.enabled != false && (var.firewall_policy_arn == null || var.firewall_policy_arn == "")
+  create_policy       = (var.firewall_policy_arn == null || var.firewall_policy_arn == "")
 
   # Determine deployment mode
   is_vpc_mode = var.vpc_id != null

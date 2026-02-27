@@ -114,9 +114,8 @@ variable "logging_config" {
 
 variable "aws_managed_rule_groups" {
   type = list(object({
-    name     = string
-    priority = number
+    name = string
   }))
-  description = "List of AWS managed rule groups to include in the firewall policy. Each object should have 'name' (the AWS managed rule group name) and 'priority' (evaluation priority)"
+  description = "List of AWS managed rule groups to include in the firewall policy. Each object should have 'name' (the AWS managed rule group name). Priority is automatically managed by AWS for managed rule groups."
   default     = []
 }

@@ -286,7 +286,7 @@ resource "aws_networkfirewall_firewall_policy" "default" {
     dynamic "stateful_rule_group_reference" {
       for_each = var.aws_managed_rule_groups
       content {
-        resource_arn = "arn:aws:network-firewall:${data.aws_region.current[0].name}:aws:managed-rulegroup/${stateful_rule_group_reference.value.name}"
+        resource_arn = "arn:aws:network-firewall:${local.region}:aws-managed:stateful-rulegroup/${stateful_rule_group_reference.value.name}"
         priority     = stateful_rule_group_reference.value.priority
       }
     }

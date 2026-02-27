@@ -278,8 +278,8 @@ resource "aws_networkfirewall_firewall_policy" "default" {
       for_each = toset([for k, v in aws_networkfirewall_rule_group.default : v.arn if v.type == "STATEFUL"])
       content {
         resource_arn = stateful_rule_group_reference.value
-        # Only set priority for custom rule groups when NOT using STRICT_ORDER
-        priority = var.policy_stateful_engine_options_rule_order != "STRICT_ORDER" ? index([for k, v in aws_networkfirewall_rule_group.default : v.arn if v.type == "STATEFUL"], stateful_rule_group_reference.value) + 1 : null
+        # Custom rule groups always need priority, regardless of rule order
+        priority = index([for k, v in aws_networkfirewall_rule_group.default : v.arn if v.type == "STATEFUL"], stateful_rule_group_reference.value) + 1
       }
     }
 

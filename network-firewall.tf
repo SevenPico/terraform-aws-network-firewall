@@ -283,23 +283,6 @@ resource "aws_networkfirewall_firewall_policy" "default" {
       }
     }
 
-    # AWS Managed Rule Groups
-    dynamic "stateful_rule_group_reference" {
-      for_each = var.aws_managed_rule_groups
-      content {
-        resource_arn = "arn:aws:network-firewall:${local.region}:aws-managed:stateful-rulegroup/${stateful_rule_group_reference.value.name}"
-        # AWS managed rule groups cannot have priority set
-        # When using STRICT_ORDER, AWS manages the priority automatically
-        
-        # Override configuration for AWS managed rule groups when using STRICT_ORDER
-        dynamic "override" {
-          for_each = var.policy_stateful_engine_options_rule_order == "STRICT_ORDER" ? [1] : []
-          content {
-            action = lookup(stateful_rule_group_reference.value, "override_action", "DROP_TO_ALERT")
-          }
-        }
-      }
-    }
 
 
     dynamic "stateful_engine_options" {

@@ -45,67 +45,6 @@ module "network_firewall" {
 }
 ```
 
-### AWS Managed Rule Groups and STRICT_ORDER
-
-When using `policy_stateful_engine_options_rule_order = "STRICT_ORDER"`, there are specific requirements for AWS managed rule groups:
-
-1. **No Priority Assignment**: AWS managed rule groups cannot have priorities assigned when using STRICT_ORDER
-2. **Override Actions**: You can specify override actions for AWS managed rule groups to control their behavior
-3. **Custom Rule Groups**: Custom rule groups with `STRICT_ORDER` must also have their rule group configured with `rule_order = "STRICT_ORDER"`
-
-**Example with AWS managed rule groups and STRICT_ORDER:**
-```hcl
-module "network_firewall" {
-  source = "SevenPico/network-firewall/aws"
-  
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.subnets.private_subnet_ids
-  
-  # Enable STRICT_ORDER for the policy
-  policy_stateful_engine_options_rule_order = "STRICT_ORDER"
-  
-  # AWS managed rule groups with override actions
-  aws_managed_rule_groups = [
-    {
-      name            = "ThreatSignaturesIOCStrictOrder"
-      override_action = "DROP_TO_ALERT"
-    },
-    {
-      name            = "AttackInfrastructureStrictOrder"
-      override_action = "ALERT_TO_DROP"
-    }
-  ]
-  
-  # Custom rule groups must also use STRICT_ORDER
-  rule_group_config = {
-    custom-strict-rules = {
-      capacity = 100
-      name     = "custom-strict-rules"
-      type     = "STATEFUL"
-      rule_group = {
-        stateful_rule_options = {
-          rule_order = "STRICT_ORDER"  # Required for STRICT_ORDER policy
-        }
-        rules_source = {
-          # Your custom rules here
-        }
-      }
-    }
-  }
-}
-```
-
-**Available AWS Managed Rule Groups for STRICT_ORDER:**
-- `ThreatSignaturesIOCStrictOrder`
-- `AttackInfrastructureStrictOrder`
-- `MalwareDomainsStrictOrder`
-- `AbusedLegitMalwareDomainsStrictOrder`
-- `BotNetCommandAndControlDomainsStrictOrder`
-
-**Override Actions:**
-- `DROP_TO_ALERT`: Changes DROP actions to ALERT actions
-- `ALERT_TO_DROP`: Changes ALERT actions to DROP actions
-
 For a complete example, see [examples/complete](examples/complete)
 
 For automated tests of the complete example using [bats](https://github.com/bats-core/bats-core) and [Terratest](https://github.com/gruntwork-io/terratest) (which tests and deploys the example on AWS), see [test](test).

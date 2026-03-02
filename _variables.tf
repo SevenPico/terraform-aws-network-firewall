@@ -111,12 +111,3 @@ variable "logging_config" {
   description = "Logging configuration"
   default     = {}
 }
-
-variable "aws_managed_rule_groups" {
-  type = list(object({
-    name            = string
-    override_action = optional(string, "DROP_TO_ALERT")
-  }))
-  description = "List of AWS managed rule groups to include in the firewall policy. Each object should have 'name' (the AWS managed rule group name) and optionally 'override_action' (valid values: DROP_TO_ALERT, ALERT_TO_DROP) for STRICT_ORDER policies. Priority is automatically managed by AWS for managed rule groups."
-  default     = []
-}

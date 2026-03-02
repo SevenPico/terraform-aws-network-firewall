@@ -23,27 +23,7 @@ The module also supports using an external (pre-existing) firewall policy instea
 - Separate policy management from firewall deployment
 - Use policies created by other tools or processes
 
-When `firewall_policy_arn` is provided, the module will:
-- Skip creating a firewall policy resource
-- Use the provided external policy ARN for the firewall
-- Ignore policy-related variables like `aws_managed_rule_groups`, `rule_group_config`, etc.
-
-**Example with external policy:**
-```hcl
-module "network_firewall" {
-  source = "SevenPico/network-firewall/aws"
-  
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.subnets.private_subnet_ids
-  
-  # Use an external firewall policy
-  firewall_policy_arn = "arn:aws:network-firewall:us-east-1:123456789012:firewall-policy/my-external-policy"
-  
-  # Policy-related variables are ignored when using external policy
-  # aws_managed_rule_groups = [] # Ignored
-  # rule_group_config = {}       # Ignored
-}
-```
+When using an external firewall policy, you would need to modify the module to skip creating the firewall policy resource and use the external policy ARN instead.
 
 For a complete example, see [examples/complete](examples/complete)
 
